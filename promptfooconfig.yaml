@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# Learn more about building a configuration: https://promptfoo.dev/docs/configuration/guide
+
+description: "My eval"
+
+prompts:
+  - "{{question}}"
+
+providers:
+  # - id: "file://sambanova_llama_3_1_direct.py"
+  #   config:
+  #     pythonExecutable: "venv/bin/python"
+
+  # Local LLMS
+  - id: "file://crew_api.py"
+    label: "ollama/gpt-oss:20b"
+    config: {
+      "model_name" : "ollama/gpt-oss:20b"
+    }
+  - id: "file://crew_api.py"
+    label: "ollama/qwen3"
+    config: {
+      "model_name" : "ollama/qwen3"
+    }
+  - id: "file://crew_api.py"
+    label: "ollama/llama3.2"
+    config: {
+      "model_name" : "ollama/llama3.2"
+    }
+
+  # Cloud LLMs
+  # - id: "file://crew_api.py"
+  #   config: {
+  #     "model_name" : "sambanova/llama-3.1-8b-instruct"
+  #   }
+  # - id: "file://crew_api.py"
+  #   config: {
+  #     "model_name" : "openai/o3-mini"
+  #   }
+  # - id: "file://crew_api.py"
+  #   config: {
+  #     "model_name" : "anthropic/claude-3-haiku-20240307"
+  #   }
+  
+tracing:
+  enabled: true # Enable/disable tracing
+  otlp:
+    http:
+      enabled: true # Required to start the OTLP receiver
+      # port: 4318   # Optional - defaults to 4318 (standard OTLP HTTP port)
+      # host: '0.0.0.0'  # Optional - defaults to '0.0.0.0'
+
+tests:
+  - vars:
+      question: "How many nodes are in the database?"
+    assert:
+      - type: icontains
+        value: "28"
+
+  - vars:
+      question: "How many products are there?"
+    assert:
+      - type: icontains
+        value: "7"
+
+  - vars:
+      question: "How many employees work for Acme Inc?"
+    assert:
+      - type: icontains
+        value: "12"
+
+
+  - vars:
+      question: "Which department does Alice Brown work for?"
+    assert:
+      - type: icontains
+        value: "Finance"
