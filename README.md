@@ -11,10 +11,15 @@ The following packages will need to be installed:
 2. Copy the sample.env file to a .env file: `cp sample.env .env`
 3. Add your credentials to the .env file
 
+## Running direct
+1. Run `uv run promptfoo eval -o output.html --no-cache` to run the eval tests
 
-## Running
+## Running with FastAPI
 1. First Start the FastAPI server to act as an interface for promptfoo tests: `uv run main.py`
-2. Run `promptfoo eval -o output.html` to run the eval tests
+2. Run `promptfoo eval -o output.html --no-cache` to run the eval tests
+
+## Clear Cache
+`promptfoo cache clear`
 
 ## License
 MIT
