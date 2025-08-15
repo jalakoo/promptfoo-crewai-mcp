@@ -66,28 +66,28 @@ async def get_crewai_endpoint(
         print(f'[{timestamp}] [Request-ID: {request_id}] Request failed after {process_time:.4f}s')
         raise HTTPException(status_code=500, detail=error_msg)
 
-@app.post("/crewai")
-async def post_crewai_endpoint(request: Request, payload: PromptRequest):
-    """POST endpoint that accepts a JSON payload with prompt and llm_name"""
-    start_time = time.time()
-    request_id = request.headers.get('X-Request-ID', 'no-request-id')
-    timestamp = datetime.now().isoformat()
+# @app.post("/crewai")
+# async def post_crewai_endpoint(request: Request, payload: PromptRequest):
+#     """POST endpoint that accepts a JSON payload with prompt and llm_name"""
+#     start_time = time.time()
+#     request_id = request.headers.get('X-Request-ID', 'no-request-id')
+#     timestamp = datetime.now().isoformat()
     
-    print(f'[{timestamp}] [Request-ID: {request_id}] POST /crewai - Processing request')
-    print(f'[{timestamp}] [Request-ID: {request_id}] Prompt: {payload.prompt}')
+#     print(f'[{timestamp}] [Request-ID: {request_id}] POST /crewai - Processing request')
+#     print(f'[{timestamp}] [Request-ID: {request_id}] Prompt: {payload.prompt}')
     
-    try:
-        result = run(payload.prompt, payload.full_model_name)
-        process_time = time.time() - start_time
+#     try:
+#         result = run(payload.prompt, payload.full_model_name)
+#         process_time = time.time() - start_time
         
-        print(f'[{timestamp}] [Request-ID: {request_id}] Request completed in {process_time:.4f}s')
-        return result
-    except Exception as e:
-        process_time = time.time() - start_time
-        error_msg = f"Error processing request: {str(e)}"
-        print(f'[{timestamp}] [Request-ID: {request_id}] {error_msg}')
-        print(f'[{timestamp}] [Request-ID: {request_id}] Request failed after {process_time:.4f}s')
-        raise HTTPException(status_code=500, detail=error_msg)
+#         print(f'[{timestamp}] [Request-ID: {request_id}] Request completed in {process_time:.4f}s')
+#         return result
+#     except Exception as e:
+#         process_time = time.time() - start_time
+#         error_msg = f"Error processing request: {str(e)}"
+#         print(f'[{timestamp}] [Request-ID: {request_id}] {error_msg}')
+#         print(f'[{timestamp}] [Request-ID: {request_id}] Request failed after {process_time:.4f}s')
+#         raise HTTPException(status_code=500, detail=error_msg)
 
 
 if __name__ == "__main__":

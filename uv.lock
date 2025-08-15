@@ -2296,6 +2296,7 @@ dependencies = [
     { name = "crewai" },
     { name = "crewai-tools", extra = ["mcp"] },
     { name = "fastapi", extra = ["standard"] },
+    { name = "litellm" },
     { name = "python-dotenv" },
     { name = "uvicorn" },
 ]
@@ -2305,6 +2306,7 @@ requires-dist = [
     { name = "crewai", specifier = ">=0.157.0" },
     { name = "crewai-tools", extras = ["mcp"], specifier = ">=0.60.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.1" },
+    { name = "litellm", specifier = ">=1.74.9" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
     { name = "uvicorn", specifier = ">=0.35.0" },
 ]

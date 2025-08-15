@@ -2,77 +2,170 @@
 
 # Learn more about building a configuration: https://promptfoo.dev/docs/configuration/guide
 
-description: "My eval"
+description: "CrewAI + MCP Evals"
 
 prompts:
   - "{{question}}"
 
 providers:
-  # - id: "file://sambanova_llama_3_1_direct.py"
-  #   config:
-  #     pythonExecutable: "venv/bin/python"
+  # -----------------------------
+  # Local LLMs 
+  # -----------------------------
+  # - id: "file://crew_direct.py"
+  #   label: "ollama/gpt-oss:20b"
+  #   config: {
+  #     "model_name" : "ollama/gpt-oss:20b"
+  #   }
+  # - id: "file://crew_direct.py"
+  #   label: "ollama/qwen3"
+  #   config: {
+  #     "model_name" : "ollama/qwen3"
+  #   }
+  # - id: "file://crew_direct.py"
+  #   label: "ollama/llama3.2"
+  #   config: {
+  #     "model_name" : "ollama/llama3.2"
+  #   }
 
-  # Local LLMS
-  - id: "file://crew_api.py"
-    label: "ollama/gpt-oss:20b"
-    config: {
-      "model_name" : "ollama/gpt-oss:20b"
-    }
-  - id: "file://crew_api.py"
-    label: "ollama/qwen3"
-    config: {
-      "model_name" : "ollama/qwen3"
-    }
-  - id: "file://crew_api.py"
-    label: "ollama/llama3.2"
-    config: {
-      "model_name" : "ollama/llama3.2"
-    }
-
+  # -----------------------------
   # Cloud LLMs
+  # -----------------------------
+  # - id: "file://crew_direct.py"
+  #   label: "sambanova/llama-3.1-8b-instruct"
+  #   config: {
+  #     "model_name" : "sambanova/llama-3.1-8b-instruct"
+  #   }
+  - id: "file://crew_direct.py"
+    label: "sambanova/Llama-4-Maverick-17B-128E-Instruct"
+    config: {
+      "model_name" : "sambanova/Llama-4-Maverick-17B-128E-Instruct"
+    }
+  - id: "file://crew_direct.py"
+    label: "openai/o3-mini"
+    config: {
+      "model_name" : "openai/o3-mini"
+    }
+  - id: "file://crew_direct.py"
+    label: "openai/gpt-5"
+    config: {
+      "model_name" : "openai/gpt-5"
+    }
+  # - id: "file://crew_direct.py"
+  #   label: "openai/gpt-4.1"
+  #   config: {
+  #     "model_name" : "openai/gpt-4.1"
+  #   }
+  - id: "file://crew_direct.py"
+    label: "anthropic/claude-3-haiku-20240307"
+    config: {
+      "model_name" : "anthropic/claude-3-haiku-20240307"
+    }
+  # - id: "file://crew_direct.py"
+  #   label: "anthropic/claude-opus-4-1-20250805"
+  #   config: {
+  #     "model_name" : "anthropic/claude-opus-4-1-20250805"
+  #   }
+
+  # -----------------------------
+  # Local LLMS via FastAPI
+  # -----------------------------
   # - id: "file://crew_api.py"
+  #   label: "ollama/gpt-oss:20b"
+  #   config: {
+  #     "model_name" : "ollama/gpt-oss:20b"
+  #   }
+  # - id: "file://crew_api.py"
+  #   label: "ollama/qwen3"
+  #   config: {
+  #     "model_name" : "ollama/qwen3"
+  #   }
+  # - id: "file://crew_api.py"
+  #   label: "ollama/llama3.2"
+  #   config: {
+  #     "model_name" : "ollama/llama3.2"
+  #   }
+
+  # -----------------------------
+  # Cloud LLMs via FastAPI
+  # -----------------------------
+  # - id: "file://crew_api.py"
+  #   label: "sambanova/llama-3.1-8b-instruct"
   #   config: {
   #     "model_name" : "sambanova/llama-3.1-8b-instruct"
   #   }
   # - id: "file://crew_api.py"
+  #   label: "openai/o3-mini"
   #   config: {
   #     "model_name" : "openai/o3-mini"
   #   }
   # - id: "file://crew_api.py"
+  #   label: "anthropic/claude-3-haiku-20240307"
   #   config: {
   #     "model_name" : "anthropic/claude-3-haiku-20240307"
   #   }
   
-tracing:
-  enabled: true # Enable/disable tracing
-  otlp:
-    http:
-      enabled: true # Required to start the OTLP receiver
+# tracing:
+#   enabled: true # Enable/disable tracing
+#   otlp:
+#     http:
+#       enabled: true # Required to start the OTLP receiver
       # port: 4318   # Optional - defaults to 4318 (standard OTLP HTTP port)
       # host: '0.0.0.0'  # Optional - defaults to '0.0.0.0'
 
 tests:
+  # These tests intended for running against the Neo4j Northwinds Dataset
+  # See the included sample.env file for read-only credentials to access
+  # a hosted instance of this dataset
+
+  # Simple count queries
   - vars:
       question: "How many nodes are in the database?"
     assert:
       - type: icontains
-        value: "28"
+        value: "1035"
 
   - vars:
-      question: "How many products are there?"
+      question: "How many customers are there?"
     assert:
       - type: icontains
-        value: "7"
+        value: "91"
+
+  # 1 hop queries
+  - vars:
+      question: "How many products does Tokyo Traders supply?"
+    assert:
+      - type: icontains
+        value: "3"
 
   - vars:
-      question: "How many employees work for Acme Inc?"
+      question: "How many orders for Ikura were made?"
     assert:
       - type: icontains
-        value: "12"
+        value: "33"
 
+  # Multi-hop aggregration queries
+
+  # Query to confirm
+  # MATCH (c:Customer)-[:PURCHASED]-(o:Order)-[or:ORDERS]-(p:Product)
+  # WHERE p.productName = "Longlife Tofu"
+  # WITH c, o,  sum(or.quantity) as total_quantity
+  # RETURN c, o, total_quantity
+  # ORDER BY total_quantity DESC
+  - vars:
+      question: "Which customer orders the largest number of Longlife Tofu?"
+    assert:
+      - type: icontains
+        value: "Ernst Handel"
+
+  # Query to confirm
+  # MATCH (o:Order)-[or:ORDERS]-(p:Product)
+  # WHERE p.productName = "Mishi Kobe Niku"
+  # WITH p, sum(or.quantity) AS total_quantity, sum(or.quantity * p.unitPrice) as total_sales
+  # RETURN total_quantity AS units_sold, total_sales
+  # ORDER BY total_sales DESC
 
   - vars:
-      question: "Which department does Alice Brown work for?"
+      question: "What is the totals sales value of all Mishi Kobe Niku orders?"
     assert:
       - type: icontains
-        value: "Finance"
+        value: "9215"
