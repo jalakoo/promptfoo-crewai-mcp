@@ -12,13 +12,24 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# Required by promptfoo
 def call_api(
     prompt: str,
     options: Dict[str, Any],
     context: Dict[str, Any],
 ) -> Dict[str, str]:
+    """Call the crew manager API with the given prompt and options.
+    Args:
+        prompt (str): The prompt to send to the crew manager.
+        options (Dict[str, Any]): Options for the API call, from the 'config' arg.
+        context (Dict[str, Any]): Prompt data for the API call - user & system prompts.
+    Returns:
+        Dict[str, str]: The response from the crew manager API.
+    """
 
+    logger.debug(f"call_api: prompt: {prompt}")
     logger.debug(f"call_api: options: {options}")
+    logger.debug(f"call_api: context: {context}")
 
     try:
         model_name = options["config"]["model_name"]

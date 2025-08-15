@@ -25,24 +25,6 @@ load_dotenv()
 # Store generated crews by model name
 crews = {}
 
-# Singleton MCP adapter/tools
-_mcp_adapter = None
-_tools = None
-_tools_lock = threading.Lock()
-
-def _ensure_tools():
-    global _mcp_adapter, _tools
-    if _tools is None:
-        with _tools_lock:
-            if _tools is None:
-                # Persist the adapter across calls
-                _mcp_adapter = MCPServerAdapter(server_params)
-                tools = _mcp_adapter.__enter__()
-                # Ensure clean shutdown on process exit
-                atexit.register(lambda: _mcp_adapter and _mcp_adapter.__exit__(None, None, None))
-                _tools = tools
-    return _tools
-
 # Create a StdioServerParameters object
 server_params = [
     StdioServerParameters(
@@ -56,6 +38,27 @@ server_params = [
     #     env=os.environ,
     # )
 ]
+
+# Singleton MCP adapter/tools
+_mcp_adapter = None
+_tools = None
+_tools_lock = threading.Lock()
+
+
+def _ensure_tools():
+    global _mcp_adapter, _tools
+    if _tools is None:
+        with _tools_lock:
+            if _tools is None:
+                # Persist the adapter across calls
+                _mcp_adapter = MCPServerAdapter(server_params)
+                tools = _mcp_adapter.__enter__()
+                # Ensure clean shutdown on process exit
+                atexit.register(
+                    lambda: _mcp_adapter and _mcp_adapter.__exit__(None, None, None)
+                )
+                _tools = tools
+    return _tools
 
 
 # Optionally logging callbacks from Agents & Tasks
@@ -83,12 +86,11 @@ def llm_by_name(name: str = "sambanova/Meta-Llama-3.1-8B-Instruct"):
         return LLM(model=name, temperature=0, base_url="http://localhost:11434")
     if "gpt-5" in name:
         return LLM(
-            model=name,
-            drop_params=True,
-            additional_drop_params=["stop", "temperature"]
+            model=name, drop_params=True, additional_drop_params=["stop", "temperature"]
         )
     else:
         return LLM(model=name, temperature=0)
+
 
 def mcp_crew(tools, llm_name: str):
 
@@ -107,9 +109,9 @@ def mcp_crew(tools, llm_name: str):
             " and (3) write data with Cypher. Use the minimal set of tool calls needed to answer.\n"
             "Always validate Cypher syntax before execution and avoid destructive writes unless explicitly requested."
         ),
-        max_iterations=3,
-        tools = tools,
-        reasoning=False, # False for better compatibility
+        max_iter=3,
+        tools=tools,
+        reasoning=False,  # False for better compatibility
         step_callback=log_step_callback,  # Optional
         llm=llm,  # Optional - Remove if using OpenAI
     )
@@ -135,6 +137,7 @@ def mcp_crew(tools, llm_name: str):
         memory=False,
     )
 
+
 def run(prompt: str, full_model_name: str):
     # Load the MCP Tools once and reuse across calls
     tools = _ensure_tools()
@@ -156,6 +159,7 @@ def run(prompt: str, full_model_name: str):
         except Exception as e:
             last_err = e
             import time, logging
+
             logging.exception("Error during crew.kickoff (attempt %d)", attempt + 1)
             time.sleep(0.5)
     else:

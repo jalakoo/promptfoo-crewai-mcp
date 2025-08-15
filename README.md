@@ -1,5 +1,5 @@
-# Promptfoo Evals w/ CrewAI + MCP Servers
-Example application for evaluating Crew performance using MCP servers.
+# Promptfoo Evals of CrewAI + MCP Servers
+Example application for running multiple evaluation tests on LLM (Large Language Models) + CrewAI Crews + MCP (Model Context Protocol) server outputs.
 
 ## Requirements
 The following packages will need to be installed:
