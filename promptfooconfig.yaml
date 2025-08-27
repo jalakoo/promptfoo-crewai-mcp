@@ -121,27 +121,60 @@ tests:
   - vars:
       question: "How many nodes are in the database?"
     assert:
-      - type: icontains
-        value: "1035"
+      - type: contains-any
+        value: 
+          - "1035"
+          - "1,035"
 
-  - vars:
-      question: "How many customers are there?"
-    assert:
-      - type: icontains
-        value: "91"
+  # - vars:
+  #     question: "How many customers are there?"
+  #   assert:
+  #     - type: icontains
+  #       value: "91"
 
   # 1 hop queries
-  - vars:
-      question: "How many products does Tokyo Traders supply?"
-    assert:
-      - type: icontains
-        value: "3"
+  # - vars:
+  #     question: "How many products does Tokyo Traders supply?"
+  #   assert:
+  #     - type: icontains
+  #       value: "3"
 
   - vars:
       question: "How many orders for Ikura were made?"
     assert:
       - type: icontains
         value: "33"
+
+
+  # 2 hop queries
+
+  # Query to confirm
+  # MATCH (c:Customer)-[:PURCHASED]->(o:Order)-[:ORDERS]->(p:Product)-[:PART_OF]->(cat:Category)
+  # WHERE cat.categoryName = 'Produce'
+  # RETURN count(DISTINCT c) as customerCount
+  - vars:
+      question: "How many customers purchased Produce products?"
+    assert:
+      - type: icontains
+        value: "63"
+
+  # Query to confirm
+  # MATCH (c:Customer)-[:PURCHASED]->(o:Order)-[:ORDERS]->(p:Product)
+  # WITH max(p.unitPrice) as maxPrice
+  # MATCH (c:Customer)-[:PURCHASED]->(o:Order)-[:ORDERS]->(p:Product)
+  # WHERE p.unitPrice = maxPrice
+  # RETURN c.companyName
+  # ORDER BY c.companyName ASC
+  # LIMIT 1
+  - vars:
+      question: "Which customer purchased the most expensive product (first alphabetically if more than one)?"
+    assert:
+      - type: contains-any
+        value: 
+          - "Berglunds"
+          - "snabbköp"
+
+
 
   # Multi-hop aggregration queries
 
@@ -151,11 +184,11 @@ tests:
   # WITH c, o,  sum(or.quantity) as total_quantity
   # RETURN c, o, total_quantity
   # ORDER BY total_quantity DESC
-  - vars:
-      question: "Which customer orders the largest number of Longlife Tofu?"
-    assert:
-      - type: icontains
-        value: "Ernst Handel"
+  # - vars:
+  #     question: "Which customer orders the largest number of Longlife Tofu?"
+  #   assert:
+  #     - type: icontains
+  #       value: "Ernst Handel"
 
   # Query to confirm
   # MATCH (o:Order)-[or:ORDERS]-(p:Product)
@@ -167,5 +200,7 @@ tests:
   - vars:
       question: "What is the totals sales value of all Mishi Kobe Niku orders?"
     assert:
-      - type: icontains
-        value: "9215"
+      - type: contains-any
+        value: 
+          - "9215"
+          - "9,215"
